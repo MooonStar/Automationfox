@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dialog_edit.ui'
 #
-# Created: Fri Jul 01 21:45:12 2016
+# Created: Sat Jul 02 21:44:07 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_EditDialog(object):
     def setupUi(self, EditDialog):
         EditDialog.setObjectName("EditDialog")
-        EditDialog.resize(332, 138)
+        EditDialog.resize(332, 188)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icons/images/automationfox32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         EditDialog.setWindowIcon(icon)
@@ -77,7 +77,7 @@ class Ui_EditDialog(object):
         self.lineedit_id.setCursorMoveStyle(QtCore.Qt.LogicalMoveStyle)
         self.lineedit_id.setObjectName("lineedit_id")
         self.btn_cancel = QtGui.QPushButton(EditDialog)
-        self.btn_cancel.setGeometry(QtCore.QRect(200, 90, 51, 34))
+        self.btn_cancel.setGeometry(QtCore.QRect(200, 150, 51, 34))
         self.btn_cancel.setStyleSheet("QPushButton#btn_cancel{\n"
 "background-color:#444444;\n"
 "color: white;\n"
@@ -105,7 +105,7 @@ class Ui_EditDialog(object):
         self.label_info.setGeometry(QtCore.QRect(100, 20, 115, 22))
         self.label_info.setObjectName("label_info")
         self.btn_apply = QtGui.QPushButton(EditDialog)
-        self.btn_apply.setGeometry(QtCore.QRect(260, 90, 48, 32))
+        self.btn_apply.setGeometry(QtCore.QRect(260, 150, 48, 32))
         self.btn_apply.setStyleSheet("QPushButton#btn_apply{\n"
 "background-color:#F48024;\n"
 "color: white;\n"
@@ -128,7 +128,7 @@ class Ui_EditDialog(object):
 "")
         self.btn_apply.setObjectName("btn_apply")
         self.btn_delete = QtGui.QPushButton(EditDialog)
-        self.btn_delete.setGeometry(QtCore.QRect(10, 90, 61, 32))
+        self.btn_delete.setGeometry(QtCore.QRect(10, 150, 61, 32))
         self.btn_delete.setStyleSheet("QPushButton#btn_delete{\n"
 "background-color:red;\n"
 "color: white;\n"
@@ -146,16 +146,35 @@ class Ui_EditDialog(object):
 "background-color: darkred;\n"
 "\n"
 "}")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/images/bug-32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.btn_delete.setIcon(icon1)
         self.btn_delete.setObjectName("btn_delete")
+        self.label_url = QtGui.QLabel(EditDialog)
+        self.label_url.setGeometry(QtCore.QRect(130, 80, 115, 22))
+        self.label_url.setObjectName("label_url")
+        self.lineedit_url = QtGui.QLineEdit(EditDialog)
+        self.lineedit_url.setGeometry(QtCore.QRect(10, 110, 300, 28))
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(1)
+        sizePolicy.setHeightForWidth(self.lineedit_url.sizePolicy().hasHeightForWidth())
+        self.lineedit_url.setSizePolicy(sizePolicy)
+        self.lineedit_url.setMaximumSize(QtCore.QSize(300, 28))
+        self.lineedit_url.setSizeIncrement(QtCore.QSize(1, 1))
+        self.lineedit_url.setAutoFillBackground(False)
+        self.lineedit_url.setText("")
+        self.lineedit_url.setMaxLength(100)
+        self.lineedit_url.setFrame(False)
+        self.lineedit_url.setEchoMode(QtGui.QLineEdit.Normal)
+        self.lineedit_url.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.lineedit_url.setPlaceholderText("")
+        self.lineedit_url.setCursorMoveStyle(QtCore.Qt.LogicalMoveStyle)
+        self.lineedit_url.setObjectName("lineedit_url")
 
         self.retranslateUi(EditDialog)
         QtCore.QObject.connect(self.btn_cancel, QtCore.SIGNAL("clicked()"), EditDialog.close)
         QtCore.QObject.connect(self.btn_apply, QtCore.SIGNAL("clicked()"), EditDialog.accept)
-        QtCore.QObject.connect(self.btn_delete, QtCore.SIGNAL("clicked()"), EditDialog.delete)
         QtCore.QMetaObject.connectSlotsByName(EditDialog)
+
+
 
     def retranslateUi(self, EditDialog):
         EditDialog.setWindowTitle(QtGui.QApplication.translate("EditDialog", "Edit Test Case", None, QtGui.QApplication.UnicodeUTF8))
@@ -165,5 +184,6 @@ class Ui_EditDialog(object):
         self.btn_apply.setText(QtGui.QApplication.translate("EditDialog", "Apply", None, QtGui.QApplication.UnicodeUTF8))
         self.btn_delete.setToolTip(QtGui.QApplication.translate("EditDialog", "<html><head/><body><p>Permanently delete testcase.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.btn_delete.setText(QtGui.QApplication.translate("EditDialog", "Delete", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_url.setText(QtGui.QApplication.translate("EditDialog", "Edit url:", None, QtGui.QApplication.UnicodeUTF8))
 
 import resources_rc

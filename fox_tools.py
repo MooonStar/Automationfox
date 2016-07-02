@@ -1,18 +1,47 @@
-import json
-from testcase_1 import Test
 import inspect
-from pydoc import locate
+import json
 
 
-def add_new_testcase(json_value):
-    json_dict = {"id": json_value}
+def add_new_testcase(json_value, json_url=''):
+    """ Add a new item to json"""
+    json_dict = {"id": json_value, "url": json_url}
 
     with open('config/testcase_ids') as outfile:
         data = json.load(outfile)
+
+        if dupliacte_entry(data, json_dict['id']):
+            print "Cannot set duplicated name."
+            return False
+
         data['list'].append(json_dict)
 
     with open('config/testcase_ids', 'w') as outfile:
         json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
+    return True
+
+
+def update_entry(old, new):
+    """ Item properties has changed. Update json."""
+
+    with open('config/testcase_ids') as outfile:
+        data = json.load(outfile)
+
+        for i in data['list']:
+            # if item exists in the list
+            if i['id'] == old:
+                i['id'] = new
+
+    with open('config/testcase_ids', 'w') as outfile:
+        json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+
+
+def dupliacte_entry(data, key):
+    """ Check if given key is a duplicate in json"""
+    for i in data['list']:
+        if i['id'] == key:
+            return True
+    return False
 
 
 def get_item_url():
@@ -28,6 +57,7 @@ def get_item_url():
 
 
 def load_json():
+    """ Load json file """
     temp = []
 
     with open('config/testcase_ids') as outfile:
@@ -39,55 +69,29 @@ def load_json():
     return temp
 
 
-def update_entry(self, win, old):
-    temp = []
-    print("OLD = " + old)
-    with open('config/testcase_ids') as outfile:
-        data = json.load(outfile)
-
-        for i in data['list']:
-            if i['id'] == old:
-                # data.remove(i['id'])
-                i['id'] = self.new_test_var.get()
-                # del data['list'][i['id']]
-    print(data['list'])
-
-    with open('config/testcase_ids', 'w') as outfile:
-        json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
-
-    #win.destroy()
-
-
 # ----------------------------------------------------------------------
 
-def delete_entry(self, win):
-    temp = []
-
+def delete_entry(entry2delete):
+    """ Delete entry from json"""
     with open('config/testcase_ids') as outfile:
         data = json.load(outfile)
 
-        for i in range(len(data['list'])):
-            if data['list'][i]['id'] == "\"id\":" + "\"" + self.new_test_var.get() + "\"":
-                # data.remove(i['id'])
-                del data['list']
-                # del data['list'][i['id']]
-    print(data['list'])
+        x = 0
 
-    with open('config/testcase_ids', 'w') as outfile:
-        json.dump(data, outfile, sort_keys=True, indent=4, ensure_ascii=False)
+        for i in data['list']:
 
-    # self.testcases.append(self.new_test_var.get())
-    # self.w['values'] = self.testcases
+            # if item exists in the list
+            if i['id'] == entry2delete:
+                del data['list'][x]
+                return True
+            x = x + 1
 
-    win.destroy()
+    return False
 
 
 def count_tests(module_name):
-
     """dynamic import module to count amount of tests in that module"""
 
     mod = __import__(module_name, fromlist=['Test'])
-    klass = getattr(mod,'Test')
-    return inspect.getmembers(klass,predicate=inspect.ismethod)
-
-
+    klass = getattr(mod, 'Test')
+    return inspect.getmembers(klass, predicate=inspect.ismethod)
