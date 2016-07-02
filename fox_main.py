@@ -10,6 +10,12 @@ from compiled_ui.dialog_addnew import Ui_AddDialog
 from compiled_ui.dialog_edit import Ui_EditDialog
 from compiled_ui.main_autfox import Ui_MainWindow
 
+#directory = '/Media\ Format\ Support/'
+#file_path = '/home/hamza-c/nflc/src/tests/uitest-appium/UITests/Android/JioShare'
+#file_name = ''
+directory = ''
+file_path = 'C:/Users/Hamza/PycharmProjects/AutFox/'
+file_name = ''
 
 class AddNewDialog(QDialog, Ui_AddDialog):
     def __init__(self, parent=None):
@@ -44,11 +50,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Variables
         self.data = {}
         self.settings = None
+        self.dialog = {}
+        self.status = ['Waiting for test begin', 'Running', 'Passed', 'Failed']
         self.read_settings()
         self.add_testcase = AddNewDialog(parent)
+        self.edit_testcase = EditDialog(parent)
         self.assign_widgets()
 
-        # Declare graphics effect for splash fadeout
+        # Declare graphics effect for splash fade_out
         self.effect = QGraphicsOpacityEffect()
         self.effect_menu = QGraphicsOpacityEffect()
         self.pixmap_splash.setGraphicsEffect(self.effect)
@@ -56,17 +65,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         QGraphicsOpacityEffect.setOpacity(self.effect, 1)
         QGraphicsOpacityEffect.setOpacity(self.effect_menu, 0)
 
-        # fadeout after 2 seconds
+        # fade_out after 2 seconds
         self.ag = QSequentialAnimationGroup()
         self.ag.addPause(2000)
-        self.ag.addAnimation(self.fadeout(self.effect, 2000))
-        self.ag.addAnimation(self.fadein(self.effect_menu, 2000))
+        self.ag.addAnimation(self.fade_out(self.effect, 2000))
+        self.ag.addAnimation(self.fade_in(self.effect_menu, 2000))
         self.ag.start()
         self.ag.finished.connect(self.pixmap_splash.deleteLater)
 
     def assign_widgets(self):
         # Main window bindings
-        self.btn_start.clicked.connect(self.print_log)
+        self.btn_start.clicked.connect(self.execute_test)
         self.actionAdd_New_Test_Case.triggered.connect(self.open_add_testcase_dialog)
         self.actionEdit_Existing_Test_Case.triggered.connect(self.open_edit_testcase_dialog)
         self.actionAbout.triggered.connect(self.open_about_dialog)
@@ -74,8 +83,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lineedit_dms.textChanged.connect(self.on_changed)
         self.toolbtn_save_logs.clicked.connect(self.save_log_2_file)
 
-        print self.cb_testcases.currentText()
+        self.label_status_value.setText(self.status[0])
+        self.label_status_value.setStyleSheet("QLabel#label_status_value{ color:yellow}")
 
+        print self.cb_testcases.currentText()
         fox_tests = fox_tools.count_tests(self.cb_testcases.currentText())
 
         if fox_tests:
@@ -94,27 +105,57 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Add testcase dialog bindings
         self.add_testcase.lineedit_id.textChanged.connect(self.on_changed)
 
-    def print_log(self):
-        import random
-        new_log = "lala" + str(random.random())
-        self.list_logs.addItem(new_log)
-        self.save_log_2_file()
+    def execute_test(self):
+        try:
+            file_name = self.cb_testcases.currentText()
+            self.btn_start.setText('S T O P  T E S T')
+            self.btn_start.clicked.disconnect(self.execute_test)
+            self.btn_start.clicked.connect(self.stop_test)
+            full_path = file_path + directory + file_name + '.py'
+
+            self.label_status_value.setText(self.status[1])
+            self.label_status_value.setStyleSheet("QLabel#label_status_value{ color:cyan}")
+
+            print(full_path)
+
+            # pytest.main("-x " + full_path)
+        except ValueError:
+            pass
+
+    def stop_test(self):
+        try:
+            file_name = self.cb_testcases.currentText()
+            self.btn_start.setText('S T A R T  T E S T')
+            self.btn_start.clicked.disconnect(self.stop_test)
+            self.btn_start.clicked.connect(self.execute_test)
+
+            self.label_status_value.setText(self.status[0])
+            self.label_status_value.setStyleSheet("QLabel#label_status_value{ color:yellow}")
+
+            full_path = file_path + directory + file_name + '.py'
+            print(full_path)
+
+            # pytest.main("-c " + full_path)
+        except ValueError:
+            pass
+
 
     def extract_log(self):
-        itemsTextList = [
+        items_text_list = [
             str(self.list_logs.item(i).text())
             for i in range(self.list_logs.count())
             ]
-        print itemsTextList
-        return itemsTextList, self.list_logs.count()
+        print items_text_list
+        return items_text_list, self.list_logs.count()
 
     def save_log_2_file(self):
-        filepath = QFileDialog.getSaveFileName(self, "Save log", "", "Fox (*.autfox);;Text (*.txt);;All Files (*)");
+        file_path = QFileDialog.getSaveFileName(self, "Save log", "",
+                                                "Fox(*.autfox);;Text(*.txt);;All Files(*)")
 
-        if not filepath[0]:
+        if not file_path[0]:
             return
 
-        filename = filepath[0]
+        filename = file_path[0]
 
         import unicodedata
         filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore')
@@ -123,7 +164,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ret = True
 
         if QFile.exists(filename):
-            ret = QMessageBox.question(self, 'Overwrite',
+            ret = QMessageBox.question(QMessageBox(), 'Overwrite',
                                        'There already exists a file called %s in the current directory.' % filename,
                                        QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Cancel)
 
@@ -138,21 +179,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.information(self, 'Unable to open file', "There was an error opening '{0}'".format(filename))
             return
 
-        list, count = self.extract_log()
+        li, count = self.extract_log()
         for x in xrange(0, count):
-            outfile.write(list[x])
+            outfile.write(li[x])
             outfile.write('\n')
 
         outfile.close
 
-    def fadein(self, target, duration):
+    @staticmethod
+    def fade_in(target, duration):
         an = QPropertyAnimation(target, "opacity")
         an.setDuration(duration)
         an.setStartValue(0)
         an.setEndValue(1)
         return an
 
-    def fadeout(self, target, duration):
+    @staticmethod
+    def fade_out(target, duration):
         an = QPropertyAnimation(target, "opacity")
         an.setDuration(duration)
         an.setStartValue(1)
@@ -163,15 +206,39 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         result = self.add_testcase.exec_()
         print result == QDialog.Accepted
         if result:
-            sender = self.sender()
-            fox_tools.add_new_testcase(self.data['lineedit_id'])
+            if not fox_tools.add_new_testcase(self.data['lineedit_id']):
+                QMessageBox.question(self, 'Duplicate Entry','Please enter a different name.', QMessageBox.Ok)
+                self.open_add_testcase_dialog()
+                return
+
             self.cb_testcases.clear()
             self.cb_testcases.addItems(fox_tools.load_json())
         print self.data
 
     def open_edit_testcase_dialog(self):
-        self.dialog = EditDialog()
-        self.dialog.show()
+        self.edit_testcase.lineedit_id.setText(self.cb_testcases.currentText())
+        old = self.edit_testcase.lineedit_id.text()
+
+        self.edit_testcase.btn_delete.clicked.connect(self.delete_entry)
+
+        self.edit_testcase.lineedit_url.setText(self.label_url_value.text())
+
+        result = self.edit_testcase.exec_()
+
+        print result == QDialog.Accepted
+        if result:
+            fox_tools.update_entry(old, self.edit_testcase.lineedit_id.text())
+            self.cb_testcases.clear()
+            self.cb_testcases.addItems(fox_tools.load_json())
+        print self.data
+
+    def delete_entry(self):
+        if not fox_tools.delete_entry(self.edit_testcase.lineedit_id.text()):
+            QMessageBox.question(self, 'Could not delete', 'Entry not found.', QMessageBox.Ok)
+            self.open_edit_testcase_dialog()
+            return
+
+        #self.edit_testcase.close()
 
     def open_about_dialog(self):
         self.dialog = AboutDialog()
