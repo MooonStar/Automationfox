@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'main_autfox.ui'
 #
-# Created: Sat Jul 02 23:47:41 2016
+# Created: Sun Jul 03 18:21:38 2016
 #      by: pyside-uic 0.2.15 running on PySide 1.2.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -192,7 +192,7 @@ class Ui_MainWindow(object):
         self.label_test_case_id.setObjectName("label_test_case_id")
         self.btn_start = QtGui.QPushButton(self.groupBox)
         self.btn_start.setEnabled(True)
-        self.btn_start.setGeometry(QtCore.QRect(10, 320, 411, 39))
+        self.btn_start.setGeometry(QtCore.QRect(10, 350, 411, 39))
         self.btn_start.setBaseSize(QtCore.QSize(0, 0))
         font = QtGui.QFont()
         font.setFamily("Agency FB,Arial,serif")
@@ -282,7 +282,7 @@ class Ui_MainWindow(object):
         self.label_url_value.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByMouse)
         self.label_url_value.setObjectName("label_url_value")
         self.label_total_testcount_value = QtGui.QLabel(self.groupBox)
-        self.label_total_testcount_value.setGeometry(QtCore.QRect(100, 250, 321, 16))
+        self.label_total_testcount_value.setGeometry(QtCore.QRect(100, 250, 71, 16))
         self.label_total_testcount_value.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
         self.label_total_testcount_value.setObjectName("label_total_testcount_value")
         self.label_status = QtGui.QLabel(self.groupBox)
@@ -292,6 +292,21 @@ class Ui_MainWindow(object):
         self.label_status_value.setGeometry(QtCore.QRect(60, 269, 371, 31))
         self.label_status_value.setText("")
         self.label_status_value.setObjectName("label_status_value")
+        self.label_curr_test = QtGui.QLabel(self.groupBox)
+        self.label_curr_test.setGeometry(QtCore.QRect(160, 250, 91, 16))
+        self.label_curr_test.setObjectName("label_curr_test")
+        self.progressBar_testcase = QtGui.QProgressBar(self.groupBox)
+        self.progressBar_testcase.setGeometry(QtCore.QRect(10, 310, 411, 23))
+        self.progressBar_testcase.setProperty("value", 23)
+        self.progressBar_testcase.setTextVisible(True)
+        self.progressBar_testcase.setOrientation(QtCore.Qt.Horizontal)
+        self.progressBar_testcase.setInvertedAppearance(False)
+        self.progressBar_testcase.setTextDirection(QtGui.QProgressBar.TopToBottom)
+        self.progressBar_testcase.setObjectName("progressBar_testcase")
+        self.label_curr_test_value = QtGui.QLabel(self.groupBox)
+        self.label_curr_test_value.setGeometry(QtCore.QRect(240, 250, 91, 16))
+        self.label_curr_test_value.setText("")
+        self.label_curr_test_value.setObjectName("label_curr_test_value")
         self.gridLayout_3.addWidget(self.groupBox, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_test, "")
         self.tab_log = QtGui.QWidget()
@@ -377,7 +392,7 @@ class Ui_MainWindow(object):
         self.pixmap_logo.setPixmap(QtGui.QPixmap(":/icons/images/automationfox32.png"))
         self.pixmap_logo.setObjectName("pixmap_logo")
         self.pixmap_splash = QtGui.QLabel(self.centralwidget)
-        self.pixmap_splash.setGeometry(QtCore.QRect(-10, 0, 581, 491))
+        self.pixmap_splash.setGeometry(QtCore.QRect(490, 0, 581, 491))
         self.pixmap_splash.setText("")
         self.pixmap_splash.setPixmap(QtGui.QPixmap(":/icons/images/splash-screen.png"))
         self.pixmap_splash.setObjectName("pixmap_splash")
@@ -441,6 +456,8 @@ class Ui_MainWindow(object):
         self.label_total_testcount_value.setText(QtGui.QApplication.translate("MainWindow", "0", None, QtGui.QApplication.UnicodeUTF8))
         self.label_status.setToolTip(QtGui.QApplication.translate("MainWindow", "<html><head/><body><p>Shows current test status which may be one of the following:</p><ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:#ffff00;\">Waiting for test begin</span></li><li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:#00ffff;\">Running</span></li><li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:#00aa00;\">Passed</span></li><li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:#ff0000;\">Failed</span></li></ul></body></html>", None, QtGui.QApplication.UnicodeUTF8))
         self.label_status.setText(QtGui.QApplication.translate("MainWindow", "Status :", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_curr_test.setToolTip(QtGui.QApplication.translate("MainWindow", "<html><head/><body><p>Shows the current executed test step.</p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_curr_test.setText(QtGui.QApplication.translate("MainWindow", "Current Test:", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_test), QtGui.QApplication.translate("MainWindow", "Test", None, QtGui.QApplication.UnicodeUTF8))
         self.list_logs.setSortingEnabled(False)
         self.toolbtn_save_logs.setToolTip(QtGui.QApplication.translate("MainWindow", "Save logs", None, QtGui.QApplication.UnicodeUTF8))
