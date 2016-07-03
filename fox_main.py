@@ -98,7 +98,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def assign_widgets(self):
         # Main window bindings
-        self.btn_start.clicked.connect(self.execute_test)
+       # self.btn_start.clicked.connect(self.execute_test)
+        self.btn_start.clicked.connect(self.update_test_state)
         self.actionAdd_New_Test_Case.triggered.connect(self.open_add_testcase_dialog)
         self.actionEdit_Existing_Test_Case.triggered.connect(self.open_edit_testcase_dialog)
         self.actionAbout.triggered.connect(self.open_about_dialog)
@@ -138,7 +139,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if self.curr_state == 1:
             self.btn_start.setText('S T O P  T E S T')
+
+        import time
+        self.progressBar_testcase.setMaximum(11)
+        for i in range(1, 10):
+            self.progressBar_testcase.setValue(i)
+            qApp.processEvents()
+
+
+
         self.timer.start(1000)  # set it to timeout in 5000 ms
+
+
 
     def execute_test(self):
         if self.curr_state == 1:
@@ -271,6 +283,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # self.edit_testcase.close()
 
     def open_about_dialog(self):
+        self.label_curr_test_value.setText("AAAAAAA")
         self.dialog = AboutDialog()
         self.dialog.show()
 
