@@ -5,17 +5,19 @@ from PySide.QtCore import *
 from PySide.QtGui import *
 
 import fox_tools
+import pytest
 from compiled_ui.dialog_about import Ui_AboutDialog
 from compiled_ui.dialog_addnew import Ui_AddDialog
 from compiled_ui.dialog_edit import Ui_EditDialog
 from compiled_ui.main_autfox import Ui_MainWindow
 
-#directory = '/Media\ Format\ Support/'
-#file_path = '/home/hamza-c/nflc/src/tests/uitest-appium/UITests/Android/JioShare'
-#file_name = ''
+# directory = '/Media\ Format\ Support/'
+# file_path = '/home/hamza-c/nflc/src/tests/uitest-appium/UITests/Android/JioShare'
+# file_name = ''
 directory = ''
 file_path = 'C:/Users/Hamza/PycharmProjects/AutFox/'
 file_name = ''
+
 
 class AddNewDialog(QDialog, Ui_AddDialog):
     def __init__(self, parent=None):
@@ -36,8 +38,23 @@ class AboutDialog(QDialog, Ui_AboutDialog):
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+    _instance = None
+    _initialized = False
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(MainWindow, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent)
+        if not self._initialized:
+            super(MainWindow, self).__init__(parent)
+            # loadUi(os.path.join(SCRIPT_DIRECTORY, 'mainwindow.ui'), self)
+            self.setup(parent)
+            self._initialized = True
+
+    def setup(self, parent):
+        # super(MainWindow, self).__init__(parent)
         self.setWindowIcon(QIcon('automationfox32.png'))
 
         myappid = 'MyOrganization.MyGui.1.0.0'  # arbitrary string
@@ -52,6 +69,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings = None
         self.dialog = {}
         self.status = ['Waiting for test begin', 'Running', 'Passed', 'Failed']
+        self.state_color = ['yellow', 'cyan', 'green', 'red']
+        self.curr_state = 0
         self.read_settings()
         self.add_testcase = AddNewDialog(parent)
         self.edit_testcase = EditDialog(parent)
@@ -67,11 +86,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # fade_out after 2 seconds
         self.ag = QSequentialAnimationGroup()
-        self.ag.addPause(2000)
-        self.ag.addAnimation(self.fade_out(self.effect, 2000))
-        self.ag.addAnimation(self.fade_in(self.effect_menu, 2000))
+        self.ag.addPause(200)
+        self.ag.addAnimation(self.fade_out(self.effect, 200))
+        self.ag.addAnimation(self.fade_in(self.effect_menu, 200))
         self.ag.start()
         self.ag.finished.connect(self.pixmap_splash.deleteLater)
+
+        self.timer = QTimer()  # set up your QTimer
+        self.timer.timeout.connect(self.update_test_state)  # connect it to your update function
+        self.timer.start(1000)  # set it to timeout in 5000 ms
 
     def assign_widgets(self):
         # Main window bindings
@@ -105,40 +128,47 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Add testcase dialog bindings
         self.add_testcase.lineedit_id.textChanged.connect(self.on_changed)
 
-    def execute_test(self):
-        try:
-            file_name = self.cb_testcases.currentText()
+    def update_test_state(self):
+        self.label_status_value.setText(self.status[self.curr_state])
+        self.label_status_value.setStyleSheet(
+            "QLabel#label_status_value{ color:" + self.state_color[self.curr_state] + "}")
+
+        if self.curr_state != 1:
+            self.btn_start.setText('S T A R T  T E S T')
+
+        if self.curr_state == 1:
             self.btn_start.setText('S T O P  T E S T')
-            self.btn_start.clicked.disconnect(self.execute_test)
-            self.btn_start.clicked.connect(self.stop_test)
+        self.timer.start(1000)  # set it to timeout in 5000 ms
+
+    def execute_test(self):
+        if self.curr_state == 1:
+            self.stop_test()
+            return
+        try:
+            self.curr_state = 1
+            file_name = self.cb_testcases.currentText()
             full_path = file_path + directory + file_name + '.py'
-
-            self.label_status_value.setText(self.status[1])
-            self.label_status_value.setStyleSheet("QLabel#label_status_value{ color:cyan}")
-
             print(full_path)
-
-            # pytest.main("-x " + full_path)
+            pytest.main(['-x', full_path])
         except ValueError:
             pass
+
+    def test_results(self):
+        self.curr_state = 2
+        QMessageBox.information(self, 'Test Run Finished', 'Test execution is finished.', QMessageBox.Ok)
+        #self.stop_test()
 
     def stop_test(self):
         try:
             file_name = self.cb_testcases.currentText()
-            self.btn_start.setText('S T A R T  T E S T')
-            self.btn_start.clicked.disconnect(self.stop_test)
-            self.btn_start.clicked.connect(self.execute_test)
-
-            self.label_status_value.setText(self.status[0])
-            self.label_status_value.setStyleSheet("QLabel#label_status_value{ color:yellow}")
 
             full_path = file_path + directory + file_name + '.py'
             print(full_path)
 
+            self.curr_state = 0
             # pytest.main("-c " + full_path)
         except ValueError:
             pass
-
 
     def extract_log(self):
         items_text_list = [
@@ -207,7 +237,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print result == QDialog.Accepted
         if result:
             if not fox_tools.add_new_testcase(self.data['lineedit_id']):
-                QMessageBox.question(self, 'Duplicate Entry','Please enter a different name.', QMessageBox.Ok)
+                QMessageBox.information(self, 'Duplicate Entry', 'Please enter a different name.', QMessageBox.Ok)
                 self.open_add_testcase_dialog()
                 return
 
@@ -234,11 +264,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def delete_entry(self):
         if not fox_tools.delete_entry(self.edit_testcase.lineedit_id.text()):
-            QMessageBox.question(self, 'Could not delete', 'Entry not found.', QMessageBox.Ok)
+            QMessageBox.information(self, 'Could not delete', 'Entry not found.', QMessageBox.Ok)
             self.open_edit_testcase_dialog()
             return
 
-        #self.edit_testcase.close()
+            # self.edit_testcase.close()
 
     def open_about_dialog(self):
         self.dialog = AboutDialog()

@@ -89,9 +89,10 @@ def delete_entry(entry2delete):
     return False
 
 
+
 def count_tests(module_name):
     """dynamic import module to count amount of tests in that module"""
 
-    mod = __import__(module_name, fromlist=['Test'])
-    klass = getattr(mod, 'Test')
-    return inspect.getmembers(klass, predicate=inspect.ismethod)
+    #mod = __import__(module_name, fromlist=['Test'])
+    #klass = getattr(mod, 'Test')
+    #return inspect.getmembers(klass, predicate=inspect.ismethod)
